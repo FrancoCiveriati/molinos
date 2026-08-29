@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Molinos Río de la Plata — La calidad de siempre, en cada mesa</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#E30613">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Molinos">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --mol-red:#E30613;
+    --mol-red-dark:#B8050F;
+    --mol-white:#FFFFFF;
+    --mol-gray-bg:#F5F5F7;
+    --mol-gray-card:#EFEFF1;
+    --mol-text:#1D1D1F;
+    --mol-text-soft:#6E6E73;
+  }
+  *{ font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+  html{ scroll-behavior:smooth; }
+  body{ background:var(--mol-white); color:var(--mol-text); }
+
+  ::selection{ background:var(--mol-red); color:#fff; }
+
+  .glass-nav{
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .grain-underline{
+    background-image: linear-gradient(90deg, var(--mol-red), var(--mol-red));
+    background-repeat:no-repeat;
+    background-position: 0 100%;
+    background-size: 0% 3px;
+    transition: background-size .45s cubic-bezier(.22,1,.36,1);
+  }
+  .grain-underline:hover{ background-size:100% 3px; }
+
+  .fade-up{
+    opacity:0;
+    transform: translateY(22px);
+    transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
+  }
+  .fade-up.in{ opacity:1; transform:translateY(0); }
+
+  .brand-card{
+    transition: transform .45s cubic-bezier(.22,1,.36,1), box-shadow .45s cubic-bezier(.22,1,.36,1);
+  }
+  .brand-card:hover{
+    transform: translateY(-6px);
+    box-shadow: 0 24px 48px -18px rgba(0,0,0,0.16);
+  }
+
+  .filter-pill{
+    transition: all .3s cubic-bezier(.22,1,.36,1);
+  }
+  .filter-pill.active{
+    background: var(--mol-text);
+    color:#fff;
+  }
+
+  .ingredient-pill{
+    transition: all .25s cubic-bezier(.22,1,.36,1);
+    user-select:none;
+  }
+  .ingredient-pill.selected{
+    background: var(--mol-red);
+    color:#fff;
+    border-color: var(--mol-red);
+    transform: scale(1.04);
+  }
+  .ingredient-pill:active{ transform: scale(0.96); }
+
+  .recipe-card{
+    animation: recipeIn .5s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes recipeIn{
+    from{ opacity:0; transform: translateY(18px) scale(.98); }
+    to{ opacity:1; transform: translateY(0) scale(1); }
+  }
+
+  .match-bar-fill{
+    transition: width .8s cubic-bezier(.22,1,.36,1);
+  }
+
+  details > summary{ list-style:none; cursor:pointer; }
+  details > summary::-webkit-details-marker{ display:none; }
+  details[open] .chev{ transform: rotate(180deg); }
+  .chev{ transition: transform .35s cubic-bezier(.22,1,.36,1); }
+
+  .brand-panel{
+    max-height:0;
+    overflow:hidden;
+    transition: max-height .5s cubic-bezier(.22,1,.36,1);
+  }
+  .brand-panel.open{ max-height:600px; }
+
+  ::-webkit-scrollbar{ width:10px; height:10px; }
+  ::-webkit-scrollbar-thumb{ background:#D8D8DC; border-radius:8px; }
+
+  .hero-orb{
+    background: radial-gradient(circle at 30% 30%, rgba(227,6,19,0.10), rgba(227,6,19,0) 60%);
+  }
+
+  .scale-hover{ transition: transform .3s cubic-bezier(.22,1,.36,1); }
+  .scale-hover:hover{ transform: scale(1.03); }
+</style>
+</head>
+<body class="antialiased">
+
+<!-- ============ NAV ============ -->
+<header class="fixed top-0 left-0 right-0 z-50 glass-nav">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
+    <a href="#top" class="flex items-center gap-2">
+      <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:var(--mol-red)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L4 7V17L12 22L20 17V7L12 2Z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M12 2V22M4 7L20 17M20 7L4 17" stroke="white" stroke-width="1.1" opacity="0.6"/>
+        </svg>
+      </div>
+      <span class="font-extrabold tracking-tight text-[15px] sm:text-base" style="color:var(--mol-text)">Molinos <span style="color:var(--mol-red)">Río de la Plata</span></span>
+    </a>
+
+    <nav class="hidden md:flex items-center gap-9 text-[14px] font-medium" style="color:var(--mol-text)">
+      <a href="#catalogo" class="grain-underline pb-1">Marcas y Productos</a>
+      <a href="#recetario" class="grain-underline pb-1">Recetario Inteligente</a>
+      <a href="#nosotros" class="grain-underline pb-1">Nosotros</a>
+    </nav>
+
+    <a href="#recetario" class="hidden sm:inline-flex items-center gap-1.5 text-white text-[13px] font-semibold px-4 py-2 rounded-full scale-hover" style="background:var(--mol-red)">
+      Cociná hoy
+    </a>
+
+    <button id="installBtn" class="hidden items-center gap-1.5 text-[13px] font-semibold px-4 py-2 rounded-full scale-hover border" style="border-color:var(--mol-red); color:var(--mol-red)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13M7 12l5 5 5-5M5 21h14"/></svg>
+      Instalar app
+    </button>
+
+    <button id="menuBtn" class="md:hidden w-9 h-9 flex items-center justify-center rounded-full" style="background:var(--mol-gray-bg)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1D1D1F" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+
+  <div id="mobileMenu" class="hidden md:hidden px-6 pb-5 flex flex-col gap-4 text-sm font-medium border-t border-black/5">
+    <a href="#catalogo" class="pt-4">Marcas y Productos</a>
+    <a href="#recetario">Recetario Inteligente</a>
+    <a href="#nosotros">Nosotros</a>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section id="top" class="relative pt-40 pb-28 px-6 overflow-hidden hero-orb">
+  <div class="max-w-4xl mx-auto text-center fade-up" id="heroText">
+    <span class="inline-block text-[12px] font-semibold tracking-[0.14em] uppercase mb-5 px-3 py-1.5 rounded-full" style="background:var(--mol-gray-bg); color:var(--mol-red)">
+      Desde 1902 en las mesas argentinas
+    </span>
+    <h1 class="text-[42px] sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.04]" style="color:var(--mol-text)">
+      La calidad de siempre,<br class="hidden sm:block"> en cada mesa.
+    </h1>
+    <p class="mt-7 text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed" style="color:var(--mol-text-soft)">
+      Marcas que acompañan a las familias argentinas hace más de un siglo. Elegí tus ingredientes y te decimos qué cocinar hoy.
+    </p>
+    <div class="mt-10 flex items-center justify-center gap-4 flex-wrap">
+      <a href="#recetario" class="text-white text-[15px] font-semibold px-7 py-3.5 rounded-full scale-hover shadow-lg" style="background:var(--mol-red); box-shadow:0 12px 24px -8px rgba(227,6,19,0.45)">
+        Ir al Recetario Inteligente
+      </a>
+      <a href="#catalogo" class="text-[15px] font-semibold px-7 py-3.5 rounded-full scale-hover" style="background:var(--mol-gray-bg); color:var(--mol-text)">
+        Ver marcas
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CATÁLOGO ============ -->
+<section id="catalogo" class="py-24 px-6" style="background:var(--mol-gray-bg)">
+  <div class="max-w-7xl mx-auto">
+    <div class="fade-up mb-14 text-center max-w-2xl mx-auto">
+      <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight" style="color:var(--mol-text)">Marcas y Productos</h2>
+      <p class="mt-4 text-base sm:text-lg" style="color:var(--mol-text-soft)">Un portafolio pensado para cada momento de la cocina argentina.</p>
+    </div>
+
+    <!-- Filtros -->
+    <div id="filterBar" class="flex flex-wrap gap-2.5 justify-center mb-12 fade-up">
+      <button data-filter="Todas" class="filter-pill active px-5 py-2.5 rounded-full text-sm font-semibold bg-white border border-black/5">Todas</button>
+      <button data-filter="Pastas" class="filter-pill px-5 py-2.5 rounded-full text-sm font-semibold bg-white border border-black/5">Pastas</button>
+      <button data-filter="Arroz" class="filter-pill px-5 py-2.5 rounded-full text-sm font-semibold bg-white border border-black/5">Arroz</button>
+      <button data-filter="Aceites" class="filter-pill px-5 py-2.5 rounded-full text-sm font-semibold bg-white border border-black/5">Aceites</button>
+      <button data-filter="Harinas" class="filter-pill px-5 py-2.5 rounded-full text-sm font-semibold bg-white border border-black/5">Harinas</button>
+      <button data-filter="Premezclas" class="filter-pill px-5 py-2.5 rounded-full text-sm font-semibold bg-white border border-black/5">Premezclas</button>
+      <button data-filter="Congelados" class="filter-pill px-5 py-2.5 rounded-full text-sm font-semibold bg-white border border-black/5">Congelados</button>
+      <button data-filter="Infusiones" class="filter-pill px-5 py-2.5 rounded-full text-sm font-semibold bg-white border border-black/5">Infusiones</button>
+    </div>
+
+    <!-- Grid de marcas -->
+    <div id="brandGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </div>
+</section>
+
+<!-- ============ RECETARIO ============ -->
+<section id="recetario" class="py-24 px-6 bg-white">
+  <div class="max-w-5xl mx-auto">
+    <div class="fade-up mb-12 text-center">
+      <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight" style="color:var(--mol-text)">¿Qué cocinamos hoy?</h2>
+      <p class="mt-4 text-base sm:text-lg max-w-xl mx-auto" style="color:var(--mol-text-soft)">Marcá lo que tenés en tu heladera y alacena. Te sugerimos recetas con productos Molinos.</p>
+    </div>
+
+    <div class="fade-up rounded-3xl p-7 sm:p-10" style="background:var(--mol-gray-bg)">
+      <p class="text-sm font-semibold mb-4" style="color:var(--mol-text-soft)">Elegí tus ingredientes</p>
+      <div id="ingredientPills" class="flex flex-wrap gap-2.5"></div>
+
+      <div class="mt-8 flex items-center gap-4 flex-wrap">
+        <button id="searchRecipesBtn" class="text-white text-[15px] font-semibold px-7 py-3.5 rounded-full scale-hover" style="background:var(--mol-red)">
+          Buscar recetas
+        </button>
+        <button id="clearIngredientsBtn" class="text-[14px] font-semibold px-5 py-3.5 rounded-full" style="color:var(--mol-text-soft)">
+          Limpiar selección
+        </button>
+        <span id="selectedCount" class="text-sm font-medium ml-auto" style="color:var(--mol-text-soft)"></span>
+      </div>
+    </div>
+
+    <div id="recipeResults" class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6"></div>
+    <div id="emptyState" class="hidden mt-14 text-center">
+      <p class="text-lg font-semibold" style="color:var(--mol-text)">No encontramos una receta exacta con esa combinación.</p>
+      <p class="mt-2 text-sm" style="color:var(--mol-text-soft)">Probá sumar o quitar algún ingrediente — mostramos las recetas más cercanas a lo que elegiste.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NOSOTROS ============ -->
+<section id="nosotros" class="py-24 px-6" style="background:var(--mol-text)">
+  <div class="max-w-5xl mx-auto text-center fade-up">
+    <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">Más de 120 años cocinando junto a vos</h2>
+    <p class="mt-6 text-lg text-white/70 max-w-2xl mx-auto leading-relaxed">
+      Molinos Río de la Plata es una de las compañías de alimentos más importantes de la Argentina, con marcas líderes que forman parte de la mesa familiar desde hace generaciones. Elaboramos con los mismos estándares de calidad que hicieron historia.
+    </p>
+    <div class="mt-14 grid grid-cols-2 sm:grid-cols-4 gap-8">
+      <div>
+        <p class="text-3xl sm:text-4xl font-extrabold text-white">1902</p>
+        <p class="text-xs sm:text-sm text-white/50 mt-1">Año de fundación</p>
+      </div>
+      <div>
+        <p class="text-3xl sm:text-4xl font-extrabold text-white">8+</p>
+        <p class="text-xs sm:text-sm text-white/50 mt-1">Marcas líderes</p>
+      </div>
+      <div>
+        <p class="text-3xl sm:text-4xl font-extrabold text-white">100%</p>
+        <p class="text-xs sm:text-sm text-white/50 mt-1">Producción nacional</p>
+      </div>
+      <div>
+        <p class="text-3xl sm:text-4xl font-extrabold text-white">3</p>
+        <p class="text-xs sm:text-sm text-white/50 mt-1">Generaciones de familias</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="px-6 py-16" style="background:#0A0A0B">
+  <div class="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-10">
+    <div class="col-span-2 sm:col-span-1">
+      <span class="font-extrabold text-white text-base">Molinos <span style="color:var(--mol-red)">RdP</span></span>
+      <p class="mt-4 text-sm text-white/40 leading-relaxed">La calidad de siempre, en cada mesa argentina.</p>
+    </div>
+    <div>
+      <p class="text-white text-sm font-semibold mb-4">Compañía</p>
+      <ul class="space-y-2.5 text-sm text-white/40">
+        <li><a href="#nosotros" class="hover:text-white transition">Quiénes somos</a></li>
+        <li><a href="#" class="hover:text-white transition">Sustentabilidad</a></li>
+        <li><a href="#" class="hover:text-white transition">Trabajá con nosotros</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="text-white text-sm font-semibold mb-4">Ayuda</p>
+      <ul class="space-y-2.5 text-sm text-white/40">
+        <li><a href="#catalogo" class="hover:text-white transition">Nuestras marcas</a></li>
+        <li><a href="#recetario" class="hover:text-white transition">Recetario</a></li>
+        <li><a href="#" class="hover:text-white transition">Contacto</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="text-white text-sm font-semibold mb-4">Seguinos</p>
+      <div class="flex gap-3">
+        <a href="#" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition"><svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12Z"/></svg></a>
+        <a href="#" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition"><svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M12 2c2.7 0 3.1 0 4.1.1 1.1 0 1.8.2 2.4.4.6.2 1.1.6 1.6 1 .5.5.8 1 1 1.6.2.6.4 1.3.4 2.4.1 1 .1 1.4.1 4.1s0 3.1-.1 4.1c0 1.1-.2 1.8-.4 2.4-.2.6-.6 1.1-1 1.6-.5.5-1 .8-1.6 1-.6.2-1.3.4-2.4.4-1 .1-1.4.1-4.1.1s-3.1 0-4.1-.1c-1.1 0-1.8-.2-2.4-.4-.6-.2-1.1-.6-1.6-1-.5-.5-.8-1-1-1.6-.2-.6-.4-1.3-.4-2.4C2 15.1 2 14.7 2 12s0-3.1.1-4.1c0-1.1.2-1.8.4-2.4.2-.6.6-1.1 1-1.6.5-.5 1-.8 1.6-1 .6-.2 1.3-.4 2.4-.4C8.9 2 9.3 2 12 2Zm0 1.8c-2.6 0-3 0-4 .1-.9 0-1.4.2-1.7.3-.4.2-.7.3-1 .6-.3.3-.5.6-.6 1-.1.3-.3.8-.3 1.7-.1 1-.1 1.4-.1 4s0 3 .1 4c0 .9.2 1.4.3 1.7.2.4.3.7.6 1 .3.3.6.5 1 .6.3.1.8.3 1.7.3 1 .1 1.4.1 4 .1s3 0 4-.1c.9 0 1.4-.2 1.7-.3.4-.2.7-.3 1-.6.3-.3.5-.6.6-1 .1-.3.3-.8.3-1.7.1-1 .1-1.4.1-4s0-3-.1-4c0-.9-.2-1.4-.3-1.7-.2-.4-.3-.7-.6-1-.3-.3-.6-.5-1-.6-.3-.1-.8-.3-1.7-.3-1-.1-1.4-.1-4-.1Zm0 3.5a4.7 4.7 0 1 1 0 9.4 4.7 4.7 0 0 1 0-9.4Zm0 1.8a2.9 2.9 0 1 0 0 5.8 2.9 2.9 0 0 0 0-5.8Zm5-2a1.1 1.1 0 1 1-2.2 0 1.1 1.1 0 0 1 2.2 0Z"/></svg></a>
+        <a href="#" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition"><svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M23 4.9c-.8.4-1.7.6-2.6.8a4.5 4.5 0 0 0 2-2.5c-.9.5-1.9.9-2.9 1.1a4.5 4.5 0 0 0-7.7 4.1A12.8 12.8 0 0 1 2.6 3.7a4.5 4.5 0 0 0 1.4 6 4.4 4.4 0 0 1-2-.6v.1a4.5 4.5 0 0 0 3.6 4.4 4.5 4.5 0 0 1-2 .1 4.5 4.5 0 0 0 4.2 3.1A9 9 0 0 1 1 19a12.7 12.7 0 0 0 6.9 2c8.3 0 12.8-6.9 12.8-12.8v-.6c.9-.6 1.6-1.4 2.3-2.3Z"/></svg></a>
+      </div>
+    </div>
+  </div>
+  <div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-3">
+    <p class="text-xs text-white/30">© 2026 Molinos Río de la Plata S.A. — Sitio conceptual con fines demostrativos.</p>
+    <div class="flex gap-6 text-xs text-white/30">
+      <a href="#" class="hover:text-white/60 transition">Términos</a>
+      <a href="#" class="hover:text-white/60 transition">Privacidad</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Banner de instalación (Android/Chrome) -->
+<div id="installBanner" class="hidden fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-sm z-[60] bg-white rounded-2xl shadow-2xl border border-black/5 p-4 flex items-center gap-3">
+  <img src="icons/icon-192.png" class="w-11 h-11 rounded-xl shrink-0" alt="Ícono Molinos">
+  <div class="flex-1 min-w-0">
+    <p class="text-sm font-bold" style="color:var(--mol-text)">Instalá la app de Molinos</p>
+    <p class="text-xs" style="color:var(--mol-text-soft)">Acceso directo desde tu pantalla de inicio.</p>
+  </div>
+  <button id="installBannerBtn" class="text-white text-xs font-semibold px-3.5 py-2 rounded-full shrink-0" style="background:var(--mol-red)">Instalar</button>
+  <button id="installBannerClose" class="text-lg leading-none px-1 shrink-0" style="color:var(--mol-text-soft)">&times;</button>
+</div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const BRANDS = [
+  {
+    id:'lucchetti', name:'Lucchetti', category:'Pastas',
+    tagline:'La pasta de todos los días',
+    desc:'Pastas secas de sémola de trigo candeal, con la textura y el sabor que acompañan el almuerzo familiar desde 1929.',
+    products:['Spaghetti', 'Mostachol', 'Moñitas', 'Tallarines al huevo'],
+    color:'#E30613'
+  },
+  {
+    id:'matarazzo', name:'Matarazzo', category:'Pastas',
+    tagline:'Tradición italiana en cada plato',
+    desc:'Pastas secas de calidad superior, ideales para salsas contundentes y guisos de cuchara.',
+    products:['Fideos guiseros', 'Ñoquis', 'Canelones', 'Sopa crema'],
+    color:'#1D1D1F'
+  },
+  {
+    id:'gallo', name:'Gallo', category:'Arroz',
+    tagline:'El arroz N°1 de los argentinos',
+    desc:'Arroz de grano largo fino, seleccionado grano por grano para que siempre quede suelto.',
+    products:['Arroz Clásico', 'Arroz Integral', 'Arroz Yamaní', 'Arroz Doble Carolina'],
+    color:'#E30613'
+  },
+  {
+    id:'gallo-snack', name:'Gallo Snack', category:'Arroz',
+    tagline:'Arroz listo, en minutos',
+    desc:'Vasos de arroz saborizado listos en microondas, pensados para el ritmo de vida actual.',
+    products:['Vaso Arroz Integral', 'Vaso Arroz con Vegetales', 'Vaso Arroz Yamaní'],
+    color:'#1D1D1F'
+  },
+  {
+    id:'cocinero', name:'Cocinero', category:'Aceites',
+    tagline:'El aceite que confía tu cocina',
+    desc:'Aceites de girasol y mezcla, con el punto justo de sabor neutro para frituras y aderezos.',
+    products:['Aceite de Girasol', 'Aceite Mezcla', 'Aceite en Aerosol'],
+    color:'#E30613'
+  },
+  {
+    id:'blancaflor', name:'Blancaflor', category:'Harinas',
+    tagline:'La harina de toda la vida',
+    desc:'Harina de trigo 0000, pilar de la repostería y panificación casera argentina desde 1920.',
+    products:['Harina 0000', 'Harina Leudante', 'Fécula de Maíz'],
+    color:'#1D1D1F'
+  },
+  {
+    id:'exquisita', name:'Exquisita', category:'Premezclas',
+    tagline:'Todo listo para hornear',
+    desc:'Premezclas para bizcochuelos, tortas y facturas, con el resultado perfecto en cada horneada.',
+    products:['Premezcla Bizcochuelo', 'Premezcla Panqueques', 'Premezcla Budín'],
+    color:'#E30613'
+  },
+  {
+    id:'granja-del-sol', name:'Granja del Sol', category:'Congelados',
+    tagline:'Prácticos y nutritivos',
+    desc:'Vegetales y platos congelados que resuelven la comida del día a día sin perder frescura.',
+    products:['Mix de Vegetales', 'Milanesas de Soja', 'Tartas Congeladas', 'Buñuelos de Espinaca'],
+    color:'#1D1D1F'
+  },
+  {
+    id:'nobleza-gaucha', name:'Nobleza Gaucha', category:'Infusiones',
+    tagline:'El sabor del mate de siempre',
+    desc:'Yerba mate elaborada con hojas seleccionadas, con el gusto tradicional del mate compartido.',
+    products:['Yerba Mate Clásica', 'Yerba Mate Suave', 'Yerba Mate en Saquitos'],
+    color:'#E30613'
+  }
+];
+
+const INGREDIENTS = ['Pastas','Arroz','Pollo','Tomate','Huevo','Harina','Queso','Verduras','Verduras congeladas'];
+
+const RECIPES = [
+  {
+    name:'Tallarines a la manteca y queso',
+    time:'15 min',
+    brand:'Lucchetti',
+    needs:['Pastas','Queso'],
+    steps:['Hervir los tallarines Lucchetti en agua con sal hasta que estén al dente.','Escurrir y mezclar con manteca derretida.','Agregar queso rallado en abundancia y mezclar bien.','Servir caliente con más queso a gusto.']
+  },
+  {
+    name:'Ñoquis con salsa de tomate',
+    time:'25 min',
+    brand:'Matarazzo',
+    needs:['Pastas','Tomate','Queso'],
+    steps:['Cocinar los ñoquis Matarazzo en agua hirviendo hasta que floten.','Preparar una salsa rápida con tomate, ajo y aceite Cocinero.','Mezclar los ñoquis con la salsa.','Espolvorear queso rallado antes de servir.']
+  },
+  {
+    name:'Arroz con pollo y verduras',
+    time:'35 min',
+    brand:'Gallo',
+    needs:['Arroz','Pollo','Verduras'],
+    steps:['Dorar el pollo en trozos con aceite Cocinero.','Agregar el arroz Gallo y rehogar 2 minutos.','Sumar verduras y caldo, cocinar tapado 18 minutos.','Dejar reposar 5 minutos antes de servir.']
+  },
+  {
+    name:'Vaso de arroz express con vegetales',
+    time:'5 min',
+    brand:'Gallo Snack',
+    needs:['Arroz','Verduras congeladas'],
+    steps:['Abrir el vaso de Gallo Snack con vegetales.','Calentar en microondas siguiendo las indicaciones del envase.','Mezclar y dejar reposar un minuto.','Servir directamente, ideal para el mediodía apurado.']
+  },
+  {
+    name:'Tortilla de huevo y verduras',
+    time:'20 min',
+    brand:'Cocinero',
+    needs:['Huevo','Verduras'],
+    steps:['Batir los huevos con sal y pimienta.','Saltear las verduras en aceite Cocinero.','Incorporar el huevo batido y cocinar a fuego bajo.','Dar vuelta y cocinar el otro lado hasta dorar.']
+  },
+  {
+    name:'Tarta de verduras congeladas',
+    time:'40 min',
+    brand:'Granja del Sol',
+    needs:['Harina','Huevo','Verduras congeladas'],
+    steps:['Preparar una masa base con harina Blancaflor.','Cocinar las verduras congeladas Granja del Sol.','Mezclar con huevo y queso, volcar sobre la masa.','Hornear 30 minutos a 180°C hasta dorar.']
+  },
+  {
+    name:'Milanesas de pollo caseras',
+    time:'30 min',
+    brand:'Blancaflor',
+    needs:['Pollo','Huevo','Harina'],
+    steps:['Pasar el pollo por harina Blancaflor, huevo batido y pan rallado.','Freír en aceite Cocinero caliente hasta dorar.','Escurrir sobre papel absorbente.','Servir con guarnición de verduras.']
+  },
+  {
+    name:'Bizcochuelo casero',
+    time:'45 min',
+    brand:'Exquisita',
+    needs:['Harina','Huevo'],
+    steps:['Batir huevos con la premezcla Exquisita según el envase.','Agregar harina Blancaflor tamizada suavemente.','Volcar en un molde enmantecado.','Hornear 35-40 minutos a 180°C.']
+  },
+  {
+    name:'Fideos con salsa de tomate y queso',
+    time:'20 min',
+    brand:'Matarazzo',
+    needs:['Pastas','Tomate','Queso'],
+    steps:['Cocinar los fideos guiseros Matarazzo al dente.','Saltear tomate en aceite Cocinero hasta reducir.','Mezclar fideos con la salsa y queso rallado.','Servir bien caliente.']
+  },
+  {
+    name:'Arroz salteado con huevo y verduras congeladas',
+    time:'18 min',
+    brand:'Gallo',
+    needs:['Arroz','Huevo','Verduras congeladas'],
+    steps:['Cocinar el arroz Gallo y dejar enfriar.','Saltear las verduras congeladas en aceite Cocinero.','Sumar el arroz y un huevo batido, saltear todo junto.','Condimentar a gusto y servir caliente.']
+  },
+  {
+    name:'Mate compartido de la tarde',
+    time:'5 min',
+    brand:'Nobleza Gaucha',
+    needs:[],
+    steps:['Cebar el mate con yerba Nobleza Gaucha.','Calentar el agua sin que hierva (80°C aprox).','Cebar de a poco, siempre por el mismo lugar.','Compartir en buena compañía.']
+  },
+  {
+    name:'Pollo al horno con arroz',
+    time:'50 min',
+    brand:'Gallo',
+    needs:['Pollo','Arroz','Verduras'],
+    steps:['Colocar el pollo condimentado en una fuente con aceite Cocinero.','Agregar arroz Gallo crudo y verduras alrededor.','Cubrir con caldo y hornear 40 minutos a 190°C.','Dejar reposar antes de servir.']
+  }
+];
+
+/* ============================================================
+   ILUSTRACIONES POR CATEGORÍA (SVG originales, no logos reales)
+   ============================================================ */
+const CATEGORY_ART = {
+  Pastas: `<svg viewBox="0 0 200 140" class="w-full h-full">
+      <ellipse cx="100" cy="100" rx="86" ry="26" fill="rgba(255,255,255,0.16)"/>
+      <g stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.92">
+        <path d="M40 100 C55 40, 60 40, 55 100"/>
+        <path d="M65 100 C80 30, 85 30, 80 100"/>
+        <path d="M90 100 C105 45, 110 45, 105 100"/>
+        <path d="M115 100 C130 35, 135 35, 130 100"/>
+        <path d="M140 100 C155 42, 160 42, 155 100"/>
+        <path d="M160 100 C172 55, 176 55, 170 100"/>
+      </g>
+    </svg>`,
+  Arroz: `<svg viewBox="0 0 200 140" class="w-full h-full">
+      <ellipse cx="100" cy="100" rx="82" ry="22" fill="rgba(255,255,255,0.16)"/>
+      <g fill="white" opacity="0.92">
+        ${Array.from({length:26}).map((_,i)=>{
+          const x = 30 + (i%13)*11 + (Math.floor(i/13)%2)*5;
+          const y = 78 + Math.floor(i/13)*16 + (i%3)*2;
+          const r = (i*47)%360;
+          return `<ellipse cx="${x}" cy="${y}" rx="6.5" ry="2.6" transform="rotate(${r} ${x} ${y})"/>`;
+        }).join('')}
+      </g>
+    </svg>`,
+  Aceites: `<svg viewBox="0 0 200 140" class="w-full h-full">
+      <ellipse cx="100" cy="118" rx="70" ry="10" fill="rgba(255,255,255,0.14)"/>
+      <path d="M85 20 h30 v18 l14 14 v58 a10 10 0 0 1-10 10 H81 a10 10 0 0 1-10-10 V52 l14-14 Z"
+        fill="none" stroke="white" stroke-width="4" stroke-linejoin="round" opacity="0.95"/>
+      <rect x="88" y="66" width="24" height="34" rx="3" fill="white" opacity="0.35"/>
+      <path d="M83 16 h34" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.95"/>
+    </svg>`,
+  Harinas: `<svg viewBox="0 0 200 140" class="w-full h-full">
+      <path d="M70 30 h50 l14 66 a12 12 0 0 1-12 14 H68 a12 12 0 0 1-12-14 Z"
+        fill="none" stroke="white" stroke-width="4" stroke-linejoin="round" opacity="0.95"/>
+      <path d="M78 30 l-4-12 h42 l-4 12" fill="none" stroke="white" stroke-width="4" stroke-linejoin="round" opacity="0.95"/>
+      <g fill="white" opacity="0.6">
+        <circle cx="90" cy="58" r="2.4"/><circle cx="102" cy="66" r="2"/><circle cx="112" cy="56" r="2.6"/>
+        <circle cx="95" cy="76" r="2"/><circle cx="108" cy="80" r="2.3"/><circle cx="86" cy="70" r="1.8"/>
+      </g>
+    </svg>`,
+  Premezclas: `<svg viewBox="0 0 200 140" class="w-full h-full">
+      <ellipse cx="100" cy="108" rx="46" ry="10" fill="rgba(255,255,255,0.16)"/>
+      <path d="M60 100 L68 46 a40 12 0 0 1 64 0 L140 100 Z" fill="none" stroke="white" stroke-width="4" stroke-linejoin="round" opacity="0.95"/>
+      <ellipse cx="100" cy="46" rx="32" ry="11" fill="none" stroke="white" stroke-width="4" opacity="0.95"/>
+      <path d="M70 62 q30 14 60 0" stroke="white" stroke-width="3" fill="none" opacity="0.55"/>
+      <path d="M65 80 q35 16 70 0" stroke="white" stroke-width="3" fill="none" opacity="0.4"/>
+    </svg>`,
+  Congelados: `<svg viewBox="0 0 200 140" class="w-full h-full">
+      <g stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.95" transform="translate(100 70)">
+        <path d="M0 -34 V34 M-29 -17 L29 17 M29 -17 L-29 17"/>
+        <path d="M0 -34 l-8 8 M0 -34 l8 8 M0 34 l-8 -8 M0 34 l8 -8"/>
+        <path d="M-29 -17 l0 11 M-29 -17 l11 -3 M29 17 l0 -11 M29 17 l-11 3"/>
+        <path d="M29 -17 l-11 3 M29 -17 l3 11 M-29 17 l11 -3 M-29 17 l-3 -11"/>
+      </g>
+    </svg>`,
+  Infusiones: `<svg viewBox="0 0 200 140" class="w-full h-full">
+      <path d="M74 55 a26 30 0 0 1 52 0 v34 a26 24 0 0 1-52 0 Z" fill="none" stroke="white" stroke-width="4" opacity="0.95"/>
+      <path d="M126 62 h10 a12 12 0 0 1 0 24 h-10" fill="none" stroke="white" stroke-width="4" opacity="0.95"/>
+      <path d="M84 44 q6 -10 0 -18 M100 44 q6 -10 0 -18 M116 44 q6 -10 0 -18" stroke="white" stroke-width="3.4" fill="none" stroke-linecap="round" opacity="0.75"/>
+    </svg>`
+};
+
+/* ============================================================
+   RENDER BRANDS
+   ============================================================ */
+const brandGrid = document.getElementById('brandGrid');
+let activeFilter = 'Todas';
+
+function renderBrands(){
+  brandGrid.innerHTML = '';
+  const filtered = BRANDS.filter(b => activeFilter === 'Todas' || b.category === activeFilter);
+
+  filtered.forEach((b, i) => {
+    const card = document.createElement('div');
+    card.className = 'brand-card fade-up bg-white rounded-2xl overflow-hidden border border-black/5';
+    card.style.transitionDelay = (i * 40) + 'ms';
+    card.innerHTML = `
+      <div class="h-40 flex items-center justify-center" style="background:linear-gradient(135deg, ${b.color}, ${b.color}CC)">
+        <div class="w-32 h-24">${CATEGORY_ART[b.category]}</div>
+      </div>
+
+      <div class="p-7">
+        <div class="flex items-start justify-between">
+          <div>
+            <span class="text-[11px] font-semibold uppercase tracking-wider" style="color:${b.color}">${b.category}</span>
+            <h3 class="text-xl font-extrabold mt-1" style="color:var(--mol-text)">${b.name}</h3>
+            <p class="text-sm mt-1" style="color:var(--mol-text-soft)">${b.tagline}</p>
+          </div>
+          <div class="w-11 h-11 rounded-full flex items-center justify-center shrink-0" style="background:${b.color}15">
+            <div class="w-4 h-4 rounded-full" style="background:${b.color}"></div>
+          </div>
+        </div>
+
+        <details class="mt-5 group">
+          <summary class="flex items-center justify-between text-sm font-semibold" style="color:${b.color}">
+            <span>Ver productos destacados</span>
+            <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+          </summary>
+          <div class="mt-4 pt-4 border-t border-black/5">
+            <p class="text-sm leading-relaxed" style="color:var(--mol-text-soft)">${b.desc}</p>
+            <div class="flex flex-wrap gap-2 mt-4">
+              ${b.products.map(p => `<span class="text-xs font-medium px-3 py-1.5 rounded-full" style="background:var(--mol-gray-bg); color:var(--mol-text)">${p}</span>`).join('')}
+            </div>
+          </div>
+        </details>
+      </div>
+    `;
+    brandGrid.appendChild(card);
+  });
+
+  requestAnimationFrame(() => {
+    brandGrid.querySelectorAll('.fade-up').forEach(el => el.classList.add('in'));
+  });
+}
+
+document.getElementById('filterBar').addEventListener('click', (e) => {
+  const btn = e.target.closest('.filter-pill');
+  if(!btn) return;
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter = btn.dataset.filter;
+  renderBrands();
+});
+
+renderBrands();
+
+/* ============================================================
+   RECETARIO INTELIGENTE
+   ============================================================ */
+const ingredientPillsEl = document.getElementById('ingredientPills');
+const selectedIngredients = new Set();
+
+function renderIngredientPills(){
+  ingredientPillsEl.innerHTML = INGREDIENTS.map(ing => `
+    <button type="button" data-ing="${ing}"
+      class="ingredient-pill px-4 py-2.5 rounded-full text-sm font-semibold bg-white border border-black/10" style="color:var(--mol-text)">
+      ${ing}
+    </button>
+  `).join('');
+}
+renderIngredientPills();
+
+function updateSelectedCount(){
+  const n = selectedIngredients.size;
+  const label = document.getElementById('selectedCount');
+  label.textContent = n === 0 ? 'Ningún ingrediente seleccionado' : `${n} ingrediente${n>1?'s':''} seleccionado${n>1?'s':''}`;
+}
+updateSelectedCount();
+
+ingredientPillsEl.addEventListener('click', (e) => {
+  const btn = e.target.closest('.ingredient-pill');
+  if(!btn) return;
+  const ing = btn.dataset.ing;
+  if(selectedIngredients.has(ing)){
+    selectedIngredients.delete(ing);
+    btn.classList.remove('selected');
+  } else {
+    selectedIngredients.add(ing);
+    btn.classList.add('selected');
+  }
+  updateSelectedCount();
+});
+
+document.getElementById('clearIngredientsBtn').addEventListener('click', () => {
+  selectedIngredients.clear();
+  ingredientPillsEl.querySelectorAll('.ingredient-pill').forEach(p => p.classList.remove('selected'));
+  updateSelectedCount();
+  document.getElementById('recipeResults').innerHTML = '';
+  document.getElementById('emptyState').classList.add('hidden');
+});
+
+function scoreRecipe(recipe, selected){
+  if(recipe.needs.length === 0) return 0;
+  const matches = recipe.needs.filter(n => selected.has(n)).length;
+  return matches / recipe.needs.length;
+}
+
+function renderRecipeCard(recipe, matchPct, i){
+  const card = document.createElement('div');
+  card.className = 'recipe-card bg-white rounded-2xl p-6 border border-black/5';
+  card.style.animationDelay = (i * 80) + 'ms';
+
+  const matchColor = matchPct >= 0.99 ? '#1DB954' : (matchPct >= 0.5 ? '#E39C06' : '#E30613');
+
+  card.innerHTML = `
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <h3 class="text-lg font-extrabold" style="color:var(--mol-text)">${recipe.name}</h3>
+        <p class="text-xs font-semibold mt-1" style="color:var(--mol-text-soft)">⏱ ${recipe.time} · Marca sugerida: <span style="color:var(--mol-red)">${recipe.brand}</span></p>
+      </div>
+      <span class="text-[11px] font-bold px-2.5 py-1 rounded-full shrink-0" style="background:${matchColor}18; color:${matchColor}">
+        ${Math.round(matchPct*100)}% match
+      </span>
+    </div>
+
+    <div class="mt-3 w-full h-1.5 rounded-full overflow-hidden" style="background:var(--mol-gray-bg)">
+      <div class="match-bar-fill h-full rounded-full" style="width:0%; background:${matchColor}"></div>
+    </div>
+
+    <details class="mt-4 group">
+      <summary class="flex items-center justify-between text-sm font-semibold" style="color:var(--mol-text)">
+        <span>Ver preparación</span>
+        <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+      </summary>
+      <ol class="mt-3 pt-3 border-t border-black/5 space-y-2.5">
+        ${recipe.steps.map((s, idx) => `
+          <li class="flex gap-3 text-sm leading-relaxed" style="color:var(--mol-text-soft)">
+            <span class="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold text-white" style="background:var(--mol-red)">${idx+1}</span>
+            <span>${s}</span>
+          </li>
+        `).join('')}
+      </ol>
+    </details>
+  `;
+
+  document.getElementById('recipeResults').appendChild(card);
+  requestAnimationFrame(() => {
+    const bar = card.querySelector('.match-bar-fill');
+    setTimeout(() => { bar.style.width = Math.round(matchPct*100) + '%'; }, 50);
+  });
+}
+
+document.getElementById('searchRecipesBtn').addEventListener('click', () => {
+  const resultsEl = document.getElementById('recipeResults');
+  const emptyEl = document.getElementById('emptyState');
+  resultsEl.innerHTML = '';
+  emptyEl.classList.add('hidden');
+
+  if(selectedIngredients.size === 0){
+    emptyEl.classList.remove('hidden');
+    emptyEl.querySelector('p').textContent = 'Elegí al menos un ingrediente para empezar.';
+    return;
+  }
+
+  const scored = RECIPES
+    .map(r => ({ recipe:r, score:scoreRecipe(r, selectedIngredients) }))
+    .filter(x => x.score > 0)
+    .sort((a,b) => b.score - a.score);
+
+  if(scored.length === 0){
+    emptyEl.classList.remove('hidden');
+    return;
+  }
+
+  scored.slice(0, 6).forEach((x, i) => renderRecipeCard(x.recipe, x.score, i));
+
+  resultsEl.scrollIntoView({ behavior:'smooth', block:'nearest' });
+});
+
+/* ============================================================
+   MOBILE MENU
+   ============================================================ */
+document.getElementById('menuBtn').addEventListener('click', () => {
+  document.getElementById('mobileMenu').classList.toggle('hidden');
+});
+document.querySelectorAll('#mobileMenu a').forEach(a => {
+  a.addEventListener('click', () => document.getElementById('mobileMenu').classList.add('hidden'));
+});
+
+/* ============================================================
+   SCROLL REVEAL
+   ============================================================ */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      entry.target.classList.add('in');
+    }
+  });
+}, { threshold:0.12 });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+document.getElementById('heroText').classList.add('in');
+
+/* ============================================================
+   PWA: registro de service worker + instalación en Android
+   ============================================================ */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(() => {});
+  });
+}
+
+let deferredInstallPrompt = null;
+const installBtn = document.getElementById('installBtn');
+const installBanner = document.getElementById('installBanner');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  installBtn.classList.remove('hidden');
+  installBtn.classList.add('inline-flex');
+  installBanner.classList.remove('hidden');
+});
+
+async function triggerInstall(){
+  if(!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  installBtn.classList.add('hidden');
+  installBanner.classList.add('hidden');
+}
+
+installBtn.addEventListener('click', triggerInstall);
+document.getElementById('installBannerBtn')?.addEventListener('click', triggerInstall);
+document.getElementById('installBannerClose')?.addEventListener('click', () => installBanner.classList.add('hidden'));
+
+window.addEventListener('appinstalled', () => {
+  installBtn.classList.add('hidden');
+  installBanner.classList.add('hidden');
+});
+</script>
+</body>
+</html>
